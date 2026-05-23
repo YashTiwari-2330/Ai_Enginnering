@@ -1,0 +1,13 @@
+# How to merge the branches to main branch?
+-> First know the your postion which branch you have
+-> After check your position 
+-> Get the command:-
+                    git merge branch_name
+
+# Merge a conflic file?
+-> If devloper work both branch as same time 
+-> Then you check the both code and find a mistke in one branch
+-> now use command:-
+                    git merge old_branch_name
+
+        

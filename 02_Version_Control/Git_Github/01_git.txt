@@ -1,0 +1,28 @@
+# What is git and github?
+#_> An git are version control to handal the changes of your site
+
+# Github:-  Github is a platform where user add it's work using the commands.
+
+# What is branch ?
+-? In github branch are called a folder
+- IN github wee create an multiple folder/ branches
+
+# How to add git branch into github platform?
+- 1. Create account on github and create repositry,
+- 2. After create an repositry then copy the Https links
+- 3. Now :
+            - Add git init
+            - git add filename or (.) for select all
+            - git commit "Message"
+            - git add origin "Https"link
+            - git push -u main
+
+
+# Cammands:-
+`           - git branch            :-  Show the avalable branches in the system.
+            - git branch branchName :-  Create an new branches
+            - git switch branchName :-  switch the one branch to another branch
+            - git log               :-  show the information about your branch
+            - git switch -c branchName :- Switch the branch if branch doesn't exist it will auto create branch
+            - git checkout branchName :- Get the branch are exist or not 
+
