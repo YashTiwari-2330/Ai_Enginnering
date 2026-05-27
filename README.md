@@ -2,8 +2,8 @@
 Step by step and phase by phase understand and learning to become a Ai Enginer
 
 
-# What is Vrsion control?
--> An version control will help the handal the multiple same task into same place in same time.
+# Start With Fundamental of Python
+-> Variable , datatype, loops , conditional statemnt,oops etc...
 
-# How to and when we use it?
--> It will use if multiple employe wrok into same project then use the version control
+# Second i cover version control..
+-> Learn about git , github , branches , merge branch , conflic merge branch
