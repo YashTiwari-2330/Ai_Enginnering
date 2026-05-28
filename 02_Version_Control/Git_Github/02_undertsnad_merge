@@ -11,3 +11,18 @@
                     git merge old_branch_name
 
         
+# Now all about the stash 
+-> Stash is a temparary storage like stack.
+
+# When use a stash?
+-> Stach will use when you write somthing but you don't want to commit right
+-> So stash will move data into temporrary storage so 
+-> Without interfier user work both branch
+
+
+# How to use stach with cmds?
+-> git stash          :- move into stash 
+-> git stash list     :- Show the existing list
+-> git stash apply    :- All stash back into orignal place
+-> git stash apply@{0}:- Apply stash for some specific stash
+-> git stash pop      :- Delete all the stash and apply all the stash
