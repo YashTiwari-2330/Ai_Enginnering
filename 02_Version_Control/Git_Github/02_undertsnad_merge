@@ -20,9 +20,24 @@
 -> Without interfier user work both branch
 
 
-# How to use stach with cmds?
+# How to use stach cmds?
 -> git stash          :- move into stash 
 -> git stash list     :- Show the existing list
 -> git stash apply    :- All stash back into orignal place
 -> git stash apply@{0}:- Apply stash for some specific stash
 -> git stash pop      :- Delete all the stash and apply all the stash
+
+# What is a git tags?
+ -> Git tags are a one type of sticky notes,
+ -> Way to make a specific points in your repositery,
+ 
+# When we use git tags?
+ -> An git tags will use when
+ -> You know a specific version of your programs and 
+ -> You want some extra and specific commit.
+ -> Widly use when you want to uploade some major version.
+
+# Git tags cmds..
+ -> git tag <tag_name>                          -: reate a git tags 
+ -> git tag -a <tag_name> -m "Commit meessage"   :-Create a tag with anotation commit message
+ -> git tag <show all working tags>              :- Show all the text which you crate 
