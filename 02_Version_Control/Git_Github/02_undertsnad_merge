@@ -42,4 +42,5 @@
  -> git tag <tag_name>                          -: reate a git tags 
  -> git tag -a <tag_name> -m "Commit meessage"   :-Create a tag with anotation commit message
  -> git tag <show all working tags>              :- Show all the text which you crate 
--> git stash pop      :- Delete all the stash and apply all the stash
+-> git stash pop                              :- Delete all the stash and apply all the stash
+
