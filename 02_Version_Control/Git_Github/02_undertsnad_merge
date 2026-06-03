@@ -19,13 +19,13 @@
 -> So stash will move data into temporrary storage so 
 -> Without interfier user work both branch
 
-
-# How to use stach cmds?
 # How to use stach with cmds?
 -> git stash          :- move into stash 
 -> git stash list     :- Show the existing list
 -> git stash apply    :- All stash back into orignal place
 -> git stash apply@{0}:- Apply stash for some specific stash
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 -> git stash pop      :- Delete all the stash and apply all the stash
 
 # What is a git tags?
