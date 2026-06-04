@@ -15,3 +15,10 @@
         After the merge it will add a one extra commits
         so using rebase will automatically update code with 
         currunt code without extra commit
+
+# How to be use a Rebase?
+-> 1. Ensure you are on the branch you want to rebase
+        git checkout branch_name
+
+   2. Use clone or extra branch to rebase don't use main branch 
+                git rebase main
