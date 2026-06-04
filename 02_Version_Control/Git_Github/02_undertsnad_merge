@@ -41,3 +41,6 @@
  -> git tag -a <tag_name> -m "Commit meessage"   :-Create a tag with anotation commit message
  -> git tag <show all working tags>              :- Show all the text which you crate 
  -> git tag -d <tagname>                    `    :- Delete tag
+
+
+# Understand the rebase cmds?
