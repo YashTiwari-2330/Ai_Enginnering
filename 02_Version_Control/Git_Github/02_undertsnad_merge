@@ -43,5 +43,6 @@
  -> git tag -d <tagname>                    `    :- Delete tag
 
 
-# Understand the rebase cmds?
--> For rebase topic i create a another file for batter understanding..
+# I Start new topic Managing History?
+  # 3.1 Merge commit :-
+  -> A merge commit is a commit that combines two or more commits into one.
