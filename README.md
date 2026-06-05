@@ -7,5 +7,5 @@ Step by step and phase by phase understand and learning to become a Ai Enginer
 
 # Second i cover version control..
 -> Learn about git , github , branches , merge branch , conflic merge branch , 
-    Slash , git tags
+    Slash , git tags , git rebase
 
