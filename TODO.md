@@ -1,0 +1,6 @@
+- [ ] Inspect 03_rebase.txt content and identify formatting issues
+- [ ] Create an improved, well-structured version of 03_rebase.txt with clear headings, explanations, and command blocks
+- [ ] Keep terminology consistent (rebase, branch, main) and fix typos/indentation
+- [ ] Ensure commands are accurate and presented as runnable snippets
+- [ ] Save changes to 02_Version_Control/Git_Github/03_rebase.txt
+- [ ] Provide final summary + command to view the file

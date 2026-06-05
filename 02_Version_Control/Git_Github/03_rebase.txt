@@ -1,0 +1,408 @@
+# Git Rebase and Reflog
+
+This file explains Git rebase, interactive rebase, conflict handling during
+rebase, and how `git reflog` can help recover lost commits.
+
+---
+
+## 1. What is Rebase?
+
+Rebase means moving the commits of one branch onto a new base commit.
+
+In simple words:
+
+Git takes your branch commits and replays them on top of another branch.
+
+This is useful when you want a clean, straight project history.
+
+---
+
+## 2. Merge vs Rebase
+
+Merge keeps the real branch history and creates a merge commit when needed.
+
+Rebase rewrites commit history and makes it look like your branch started from
+the latest commit of another branch.
+
+Merge example:
+
+```text
+main:    A---B---C
+             \   \
+feature:      D---E---M
+```
+
+Rebase example:
+
+```text
+main:    A---B---C
+                 \
+feature:          D'---E'
+```
+
+`D'` and `E'` are new copies of the old commits because rebase rewrites them.
+
+---
+
+## 3. When to Use Rebase
+
+Use rebase when:
+
+- You want to update your feature branch with the latest `main`.
+- You want a clean linear history.
+- Your branch is local or only used by you.
+
+Avoid rebase when:
+
+- The branch is shared with other developers.
+- Other people already pulled your branch.
+- You are not comfortable resolving conflicts yet.
+
+Important rule:
+
+Do not rebase public shared branches unless your team agrees.
+
+---
+
+## 4. Basic Rebase Syntax
+
+```bash
+git rebase branch_name
+```
+
+Common example:
+
+```bash
+git switch feature-login
+git rebase main
+```
+
+This means:
+
+Take commits from `feature-login` and replay them on top of the latest `main`.
+
+---
+
+## 5. Safe Rebase Workflow
+
+Step 1: Check your current branch:
+
+```bash
+git status
+git branch
+```
+
+Step 2: Save or commit your current work:
+
+```bash
+git add .
+git commit -m "Save current work"
+```
+
+Step 3: Update `main`:
+
+```bash
+git switch main
+git pull origin main
+```
+
+Step 4: Switch back to your feature branch:
+
+```bash
+git switch feature-login
+```
+
+Step 5: Rebase onto `main`:
+
+```bash
+git rebase main
+```
+
+Step 6: Test your project.
+
+Step 7: Push the branch:
+
+```bash
+git push
+```
+
+If the branch was already pushed before rebase, use:
+
+```bash
+git push --force-with-lease
+```
+
+`--force-with-lease` is safer than `--force` because it checks whether someone
+else pushed new work before replacing the remote branch.
+
+---
+
+## 6. Rebase Conflict
+
+A rebase conflict happens when Git cannot automatically apply one of your
+commits onto the new base.
+
+Git pauses the rebase and asks you to fix the conflict.
+
+Check conflicted files:
+
+```bash
+git status
+```
+
+Open the conflicted file and remove conflict markers:
+
+```text
+<<<<<<< HEAD
+Code from the branch you are rebasing onto
+=======
+Code from your commit being replayed
+>>>>>>> commit-message
+```
+
+After fixing the file:
+
+```bash
+git add filename
+git rebase --continue
+```
+
+If more conflicts appear, repeat:
+
+```bash
+git status
+git add filename
+git rebase --continue
+```
+
+---
+
+## 7. Abort or Skip During Rebase
+
+Cancel the rebase and return to the previous state:
+
+```bash
+git rebase --abort
+```
+
+Skip the current commit being replayed:
+
+```bash
+git rebase --skip
+```
+
+Use `--skip` carefully because it drops that commit from the rebased branch.
+
+---
+
+## 8. Interactive Rebase
+
+Interactive rebase lets you edit commit history.
+
+You can:
+
+- Rename commit messages.
+- Combine commits.
+- Reorder commits.
+- Remove commits.
+
+Start interactive rebase for the last 3 commits:
+
+```bash
+git rebase -i HEAD~3
+```
+
+Git opens a list like this:
+
+```text
+pick a1b2c3d Add login form
+pick e4f5g6h Fix login validation
+pick i7j8k9l Update login styles
+```
+
+Common interactive rebase actions:
+
+```text
+pick    use commit
+reword  use commit but edit message
+squash  combine commit with previous commit
+fixup   combine commit with previous commit and discard message
+drop    remove commit
+```
+
+Example: combine the last two commits into the first one:
+
+```text
+pick a1b2c3d Add login form
+squash e4f5g6h Fix login validation
+squash i7j8k9l Update login styles
+```
+
+---
+
+## 9. What is Git Reflog?
+
+`git reflog` shows where your branch references and `HEAD` have been.
+
+It is useful for recovering commits that disappeared after:
+
+- Reset.
+- Rebase.
+- Branch deletion.
+- Accidental history changes.
+
+Think of reflog as Git's local safety record.
+
+---
+
+## 10. View Reflog
+
+```bash
+git reflog
+```
+
+Example output:
+
+```text
+abc1234 HEAD@{0}: rebase finished: returning to refs/heads/feature-login
+def5678 HEAD@{1}: commit: Add login form
+ghi9012 HEAD@{2}: checkout: moving from main to feature-login
+```
+
+You can use `HEAD@{0}`, `HEAD@{1}`, or a commit hash to return to an older
+state.
+
+---
+
+## 11. Recover a Lost Commit
+
+Step 1: Find the commit:
+
+```bash
+git reflog
+```
+
+Step 2: Create a recovery branch from that commit:
+
+```bash
+git switch -c recovery-branch commit_hash
+```
+
+This is safer than resetting immediately because it preserves the recovered
+commit on a new branch.
+
+---
+
+## 12. Reset Using Reflog
+
+If you are sure you want to move the current branch back to an older commit:
+
+```bash
+git reset --hard commit_hash
+```
+
+or:
+
+```bash
+git reset --hard HEAD@{2}
+```
+
+Warning:
+
+`git reset --hard` removes uncommitted changes from your working directory.
+Use it carefully.
+
+---
+
+## 13. Rebase Example from Start to Finish
+
+```bash
+git switch main
+git pull origin main
+git switch feature-profile
+git rebase main
+```
+
+If conflict happens:
+
+```bash
+git status
+# fix files manually
+git add .
+git rebase --continue
+```
+
+After rebase:
+
+```bash
+git log --oneline --graph --decorate
+git push --force-with-lease
+```
+
+---
+
+## 14. Common Mistakes
+
+Mistake:
+
+Running rebase from the wrong branch.
+
+Correct:
+
+```bash
+git switch feature_branch
+git rebase main
+```
+
+Mistake:
+
+Using `git commit` to finish a rebase conflict.
+
+Correct:
+
+```bash
+git add .
+git rebase --continue
+```
+
+Mistake:
+
+Force pushing with:
+
+```bash
+git push --force
+```
+
+Better:
+
+```bash
+git push --force-with-lease
+```
+
+Mistake:
+
+Resetting without checking reflog carefully.
+
+Better:
+
+```bash
+git reflog
+git switch -c recovery-branch commit_hash
+```
+
+---
+
+## 15. Quick Command Summary
+
+```bash
+git rebase main
+git rebase --continue
+git rebase --abort
+git rebase -i HEAD~3
+git reflog
+git switch -c recovery-branch commit_hash
+git reset --hard HEAD@{2}
+```
+
+Use rebase for clean history. Use reflog when you need to recover from history
+mistakes.
