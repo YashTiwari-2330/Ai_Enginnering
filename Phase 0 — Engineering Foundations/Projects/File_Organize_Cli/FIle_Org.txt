@@ -1,0 +1,700 @@
+# FileOrg CLI Project
+
+Goal:
+Build a command line tool named `fileorg` that helps organize files, clean junk,
+find duplicates, archive old files, show large files, create backups, schedule
+jobs, and undo the last operation.
+
+Main idea:
+The user runs commands like:
+
+fileorg organize ~/Downloads
+fileorg watch ~/Downloads
+fileorg duplicates ~/Documents
+fileorg cleanup
+fileorg archive ~/Downloads --older-than 30
+fileorg large --top 10
+fileorg backup ~/Projects /mnt/backup
+fileorg schedule organize ~/Downloads --every 5m
+fileorg undo
+
+This project teaches:
+- Python file handling
+- CLI argument parsing
+- Folder traversal
+- Moving, copying, deleting, and archiving files
+- Hashing files to detect duplicates
+- JSON config and history files
+- Background watching/scheduling basics
+- Safe undo system
+- Testing a real utility
+
+
+1. Project Features
+
+1. organize
+
+Command:
+fileorg organize ~/Downloads
+
+Purpose:
+Organize files in a folder by file type.
+
+Example:
+Before:
+~/Downloads/photo.png
+~/Downloads/song.mp3
+~/Downloads/resume.pdf
+~/Downloads/app.zip
+
+After:
+~/Downloads/Images/photo.png
+~/Downloads/Audio/song.mp3
+~/Downloads/Documents/resume.pdf
+~/Downloads/Archives/app.zip
+
+Common categories:
+- Images: .jpg, .jpeg, .png, .gif, .webp, .svg
+- Documents: .pdf, .doc, .docx, .txt, .md, .pptx, .xlsx
+- Videos: .mp4, .mkv, .mov, .avi
+- Audio: .mp3, .wav, .aac, .flac
+- Archives: .zip, .rar, .tar, .gz, .7z
+- Code: .py, .js, .html, .css, .java, .cpp
+- Others: everything else
+
+Implementation steps:
+1. Take folder path from command line.
+2. Convert `~` to full path using `Path(...).expanduser()`.
+3. Check if folder exists.
+4. Loop through all files in that folder.
+5. Skip folders.
+6. Read each file extension.
+7. Decide category from extension.
+8. Create category folder if it does not exist.
+9. Move file into category folder.
+10. If file name already exists, rename safely.
+11. Save every move operation in history for undo.
+
+Important safety rule:
+Never overwrite a file. If `photo.png` already exists, create:
+photo_1.png
+photo_2.png
+photo_3.png
+
+
+2. watch
+
+Command:
+fileorg watch ~/Downloads
+
+Purpose:
+Keep watching a folder and automatically organize new files.
+
+Example:
+If the user downloads `invoice.pdf`, FileOrg automatically moves it to:
+~/Downloads/Documents/invoice.pdf
+
+Implementation steps:
+1. Start a long-running process.
+2. Watch the target folder for new files.
+3. When a new file appears, wait a few seconds so download completes.
+4. Run the same logic as `organize`.
+5. Print what was moved.
+
+Simple beginner version:
+Use a loop:
+- Scan folder every 5 seconds.
+- Remember files already seen.
+- If a new file appears, organize it.
+
+Advanced version:
+Use the `watchdog` Python package.
+
+Command example:
+pip install watchdog
+
+
+3. duplicates
+
+Command:
+fileorg duplicates ~/Documents
+
+Purpose:
+Find duplicate files in a folder.
+
+Duplicate meaning:
+Two files are duplicates if their content is exactly the same.
+Do not only compare file names because two files can have different names but
+same content.
+
+Implementation steps:
+1. Take folder path from command line.
+2. Walk through all files inside folder and subfolders.
+3. For each file, calculate a hash.
+4. Use SHA256 hash.
+5. Store hash in dictionary.
+6. If same hash appears more than once, show duplicate group.
+
+Example output:
+Duplicate group 1:
+- ~/Documents/report.pdf
+- ~/Documents/old/report-copy.pdf
+
+Duplicate group 2:
+- ~/Documents/photo.png
+- ~/Documents/backup/photo.png
+
+Optional delete feature for later:
+fileorg duplicates ~/Documents --delete
+
+Safety rule:
+At first, only show duplicates. Do not delete automatically.
+
+
+4. cleanup
+
+Command:
+fileorg cleanup
+
+Purpose:
+Clean common temporary files from system or project folders.
+
+Examples of cleanup targets:
+- __pycache__ folders
+- .pyc files
+- .DS_Store files
+- Thumbs.db files
+- temporary files ending with .tmp
+- empty folders
+
+Implementation steps:
+1. Decide default cleanup location.
+2. Safer beginner choice: clean current directory only.
+3. Walk through files and folders.
+4. Find cleanup patterns.
+5. Show what will be removed.
+6. Ask confirmation before deleting.
+7. Delete selected files/folders.
+8. Save deleted file info in history.
+
+Better command later:
+fileorg cleanup ~/Projects
+
+Safety rule:
+Do not delete user documents, images, videos, code, or downloads.
+Only delete known junk files.
+
+
+5. archive
+
+Command:
+fileorg archive ~/Downloads --older-than 30
+
+Purpose:
+Move old files into an archive folder.
+
+Meaning:
+`--older-than 30` means files older than 30 days.
+
+Example:
+~/Downloads/old-file.pdf
+
+Moves to:
+~/Downloads/Archive/2026-06/old-file.pdf
+
+Implementation steps:
+1. Take folder path.
+2. Take number of days from `--older-than`.
+3. Get current date/time.
+4. Check each file modified time.
+5. If file age is greater than given days, move to Archive folder.
+6. Create archive month folder like `Archive/YYYY-MM`.
+7. Save move operation in history.
+
+Safety rule:
+Skip files already inside Archive folder.
+
+
+6. large
+
+Command:
+fileorg large --top 10
+
+Purpose:
+Show the biggest files.
+
+Default behavior:
+Scan current directory.
+
+Better command later:
+fileorg large ~/Downloads --top 10
+
+Implementation steps:
+1. Take optional folder path.
+2. Take number from `--top`.
+3. Walk through folder.
+4. Get file size using `stat()`.
+5. Sort files by size descending.
+6. Print top N files with readable size.
+
+Example output:
+1. 2.1 GB  ~/Videos/movie.mp4
+2. 800 MB  ~/Downloads/ubuntu.iso
+3. 120 MB  ~/Documents/data.csv
+
+Helper function:
+Create `format_size(bytes)` to convert bytes into KB, MB, GB.
+
+
+7. backup
+
+Command:
+fileorg backup ~/Projects /mnt/backup
+
+Purpose:
+Copy one folder to another location as a backup.
+
+Example:
+Source:
+~/Projects
+
+Destination:
+/mnt/backup
+
+Result:
+/mnt/backup/Projects_backup_2026-06-06_10-30
+
+Implementation steps:
+1. Take source path.
+2. Take destination path.
+3. Check source exists.
+4. Check destination exists or create it.
+5. Create backup folder with date/time.
+6. Copy all files and folders.
+7. Print total files copied.
+8. Save backup operation in history.
+
+Python tool:
+Use `shutil.copytree()`.
+
+Safety rule:
+Do not overwrite an existing backup folder.
+
+
+8. schedule
+
+Command:
+fileorg schedule organize ~/Downloads --every 5m
+
+Purpose:
+Run a FileOrg command repeatedly.
+
+Example:
+Every 5 minutes, organize Downloads folder.
+
+Supported time formats:
+- 5s = every 5 seconds
+- 5m = every 5 minutes
+- 2h = every 2 hours
+
+Implementation steps:
+1. Parse the command after `schedule`.
+2. Parse time from `--every`.
+3. Convert time to seconds.
+4. Start loop.
+5. Run selected command.
+6. Sleep for given time.
+7. Repeat until user stops with Ctrl + C.
+
+Beginner version:
+Only support:
+fileorg schedule organize PATH --every TIME
+
+Advanced version:
+Support duplicates, cleanup, archive, backup also.
+
+
+9. undo
+
+Command:
+fileorg undo
+
+Purpose:
+Undo the last operation.
+
+Example:
+If `organize` moved:
+~/Downloads/photo.png -> ~/Downloads/Images/photo.png
+
+Then `fileorg undo` moves it back:
+~/Downloads/Images/photo.png -> ~/Downloads/photo.png
+
+Implementation steps:
+1. Every command that changes files must save history.
+2. History file stores operations in JSON.
+3. `undo` reads the last operation.
+4. Reverse each action in opposite order.
+5. Remove the undone operation from history.
+
+History example:
+[
+  {
+    "command": "organize",
+    "time": "2026-06-06 10:30:00",
+    "actions": [
+      {
+        "type": "move",
+        "source": "/home/yash/Downloads/photo.png",
+        "destination": "/home/yash/Downloads/Images/photo.png"
+      }
+    ]
+  }
+]
+
+Undo move:
+Move destination back to source.
+
+Undo backup:
+Ask confirmation, then remove backup folder.
+
+Undo cleanup:
+Harder because deleted files are gone.
+Better approach: cleanup should move files to a FileOrg trash folder first.
+
+
+10. Recommended Project Folder Structure
+
+fileorg/
+  fileorg/
+    __init__.py
+    cli.py
+    organizer.py
+    watcher.py
+    duplicates.py
+    cleaner.py
+    archiver.py
+    large_files.py
+    backup.py
+    scheduler.py
+    history.py
+    config.py
+    utils.py
+  tests/
+    test_organizer.py
+    test_duplicates.py
+    test_archiver.py
+    test_large_files.py
+    test_history.py
+  pyproject.toml
+  README.md
+
+File responsibilities:
+
+cli.py:
+- Handles command line arguments.
+- Calls the correct feature.
+
+organizer.py:
+- Contains logic for organizing files by extension.
+
+watcher.py:
+- Contains folder watching logic.
+
+duplicates.py:
+- Contains hash calculation and duplicate detection.
+
+cleaner.py:
+- Contains cleanup logic.
+
+archiver.py:
+- Contains old file archive logic.
+
+large_files.py:
+- Contains biggest file search logic.
+
+backup.py:
+- Contains backup copy logic.
+
+scheduler.py:
+- Contains repeated command logic.
+
+history.py:
+- Saves and loads operation history.
+- Used by undo.
+
+config.py:
+- Stores file categories and default settings.
+
+utils.py:
+- Shared helper functions.
+
+
+11. CLI Design
+
+Use Python argparse for beginner version.
+
+Main commands:
+
+fileorg organize PATH
+fileorg watch PATH
+fileorg duplicates PATH
+fileorg cleanup [PATH]
+fileorg archive PATH --older-than DAYS
+fileorg large [PATH] --top NUMBER
+fileorg backup SOURCE DESTINATION
+fileorg schedule organize PATH --every TIME
+fileorg undo
+
+Later, you can use Typer or Click for a nicer CLI.
+
+
+12. Data Storage
+
+Store FileOrg data in user home folder:
+
+~/.fileorg/
+  config.json
+  history.json
+  trash/
+
+config.json:
+Stores categories and extensions.
+
+history.json:
+Stores previous file-changing operations.
+
+trash/:
+Stores cleanup files instead of deleting immediately.
+
+
+13. First Version Implementation Plan
+
+Phase 1: Basic CLI
+1. Create project folder.
+2. Create `cli.py`.
+3. Add argparse.
+4. Add commands with placeholder print statements.
+5. Test every command runs.
+
+Phase 2: Organize
+1. Create extension category mapping.
+2. Implement safe file move.
+3. Create category folders.
+4. Move files.
+5. Handle duplicate names.
+6. Save history.
+
+Phase 3: Undo
+1. Create history file.
+2. Save every move from organize.
+3. Implement undo for move actions.
+4. Test organize then undo.
+
+Phase 4: Duplicates
+1. Walk folder recursively.
+2. Calculate file hash.
+3. Group files by hash.
+4. Print duplicate groups.
+
+Phase 5: Archive
+1. Read `--older-than`.
+2. Compare file modified date.
+3. Move old files to Archive/YYYY-MM.
+4. Save history.
+
+Phase 6: Large Files
+1. Scan folder recursively.
+2. Sort by file size.
+3. Show top N files.
+
+Phase 7: Cleanup
+1. Find junk files.
+2. Show preview.
+3. Ask for confirmation.
+4. Move to FileOrg trash.
+5. Save history.
+
+Phase 8: Backup
+1. Copy source folder to destination.
+2. Add timestamp to backup folder.
+3. Print summary.
+4. Save history.
+
+Phase 9: Watch
+1. Create simple polling loop.
+2. Detect new files.
+3. Organize new files.
+4. Later replace with watchdog.
+
+Phase 10: Schedule
+1. Parse interval like 5m.
+2. Run command in loop.
+3. Sleep between runs.
+4. Stop cleanly on Ctrl + C.
+
+
+14. Important Helper Functions
+
+resolve_path(path):
+- Expands `~`.
+- Converts relative path to absolute path.
+- Checks if path exists.
+
+safe_move(source, destination_folder):
+- Moves a file.
+- Avoids overwriting.
+- Returns final destination path.
+
+get_category(file_path):
+- Reads extension.
+- Returns category name.
+
+hash_file(file_path):
+- Reads file in chunks.
+- Returns SHA256 hash.
+
+format_size(size_in_bytes):
+- Converts bytes to KB, MB, or GB.
+
+save_history(operation):
+- Adds operation to history.json.
+
+load_history():
+- Reads history.json.
+
+undo_last():
+- Reverses last operation.
+
+parse_interval("5m"):
+- Converts 5m to 300 seconds.
+
+
+15. Safety Checklist
+
+Before moving/deleting/copying files:
+- Check path exists.
+- Check path is a file or folder as expected.
+- Never overwrite existing files.
+- Skip hidden/system files in beginner version.
+- Print clear messages.
+- Save history before or immediately after actions.
+- For cleanup, move to trash instead of permanent delete.
+- For backup, never overwrite backup folders.
+
+
+16. Example User Flow
+
+Step 1:
+User runs:
+fileorg organize ~/Downloads
+
+Output:
+Organized 24 files.
+Images: 8
+Documents: 6
+Videos: 2
+Archives: 3
+Others: 5
+
+Step 2:
+User runs:
+fileorg duplicates ~/Documents
+
+Output:
+Found 3 duplicate groups.
+
+Step 3:
+User runs:
+fileorg archive ~/Downloads --older-than 30
+
+Output:
+Archived 12 old files to Archive/2026-06.
+
+Step 4:
+User runs:
+fileorg undo
+
+Output:
+Undone last operation: archive.
+
+
+17. Testing Plan
+
+Test organize:
+- Create temporary folder.
+- Add files with different extensions.
+- Run organize.
+- Check files moved into correct folders.
+
+Test duplicate names:
+- Add two files with same name.
+- Make sure second file gets renamed safely.
+
+Test duplicates:
+- Create two files with same content.
+- Check duplicate command finds them.
+
+Test archive:
+- Create old file using modified time.
+- Run archive.
+- Check file moved to Archive folder.
+
+Test large:
+- Create files with different sizes.
+- Check output order is biggest first.
+
+Test undo:
+- Run organize.
+- Run undo.
+- Check files return to original location.
+
+
+18. Beginner Tech Stack
+
+Language:
+Python
+
+Standard libraries:
+- argparse
+- pathlib
+- shutil
+- hashlib
+- json
+- time
+- datetime
+- os
+
+Optional libraries later:
+- watchdog for folder watching
+- rich for beautiful terminal output
+- typer for modern CLI
+- pytest for testing
+
+
+19. Final MVP Scope
+
+MVP means first working version.
+
+Build these first:
+1. fileorg organize ~/Downloads
+2. fileorg duplicates ~/Documents
+3. fileorg archive ~/Downloads --older-than 30
+4. fileorg large --top 10
+5. fileorg undo
+
+Build these after MVP:
+1. fileorg cleanup
+2. fileorg backup ~/Projects /mnt/backup
+3. fileorg watch ~/Downloads
+4. fileorg schedule organize ~/Downloads --every 5m
+
+
+20. Final Project Summary
+
+FileOrg is a real-world Python CLI project. It starts simple by organizing files
+into folders, then becomes more powerful with duplicates, archive, cleanup,
+backup, watch, schedule, and undo features.
+
+The most important part is safety. A file organization tool must not overwrite
+or delete user files by accident. That is why this project needs safe move,
+history, trash, confirmation, and undo.
