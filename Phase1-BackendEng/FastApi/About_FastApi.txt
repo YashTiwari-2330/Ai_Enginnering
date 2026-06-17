@@ -1,0 +1,88 @@
+========================================
+1) What is FastAPI?
+========================================
+FastAPI is a modern, high-performance Python framework used to build APIs.
+
+What it does:
+- Creates backend services for clients like web apps, mobile apps, or other servers
+- Clients send requests; FastAPI returns responses
+
+Built with:
+- Starlette (web handling)
+- Pydantic (data validation)
+
+Key features:
+- Async support (handles many requests efficiently)
+- Automatic data validation
+- Automatic API documentation (Swagger UI)
+
+Simple meaning:
+FastAPI helps you build fast, clean, and reliable backend APIs using Python.
+
+
+========================================
+2) Need of FastAPI?
+========================================
+FastAPI is useful because most applications have separate frontend and backend parts.
+
+Example architecture:
+- Frontend: React, Angular, mobile apps, websites
+- Backend: FastAPI server
+- Database: MySQL, PostgreSQL, MongoDB, etc.
+
+Workflow:
+- Frontend sends requests to the backend
+- Backend processes the request and returns results
+
+Why people choose FastAPI (benefits):
+- Speed: among the fastest Python frameworks
+- Automatic validation: checks incoming data automatically
+- Automatic docs: generates Swagger UI docs without extra effort
+- Less code: build APIs with fewer lines
+- Async support: better performance for concurrent requests
+- Type hints: makes code clearer and more maintainable
+
+
+========================================
+3) What is Monolithic Architecture?
+========================================
+Monolithic architecture means the entire application is built as one single project/system.
+
+In a monolithic app, all parts are inside the same application, such as:
+- User authentication
+- Product management
+- Payment system
+- Order system
+- Admin panel
+- Database logic
+- API routes
+
+Example: E-commerce application
+- Login system
+- Product system
+- Cart system
+- Payment system
+- Order system
+- Admin system
+
+
+========================================
+4) How to activate vertual env?
+========================================
+source env_name/bin/activate
+
+EX:-
+-> source .venv/bin/activate
+
+========================================
+5) How to start FastAPI?
+========================================
+1- Import using [from fastapi import FastAPI]
+2- Create a fastapi object like :- app = FastAPI
+3- Crate a get method like :- @app.get("/")
+4- Inside the get you create methods which run / location in uvicorn browser.
+
+5- RUN it :- 
+            1- Inside a terminal cd your currunt location
+            2- Run : uvicorn main:app --reload
+            3- IF /docs execute documentation which auto genrated

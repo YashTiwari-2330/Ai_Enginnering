@@ -1,6 +1,7 @@
 # Ai_Enginnering
 Step by step and phase by phase understand and learning to become a Ai Enginer
 
+# Phase 0
 
 # Start With Fundamental of Python
 -> Variable , datatype, loops , conditional statemnt,oops etc...
@@ -9,3 +10,7 @@ Step by step and phase by phase understand and learning to become a Ai Enginer
 -> Learn about git , github , branches , merge branch , conflic merge branch , 
     Slash , git tags , diff , rebase
 
+# Phase 1
+
+# Start FastApi Fudamental
+-> 1- Installtion Fast api.
