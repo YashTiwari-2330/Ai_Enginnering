@@ -86,3 +86,20 @@ EX:-
             1- Inside a terminal cd your currunt location
             2- Run : uvicorn main:app --reload
             3- IF /docs execute documentation which auto genrated
+
+
+========================================
+6) About HTTP Methods?
+========================================
+1. An HTTP Methods is a set of request methods used to
+   perform CRUD operations on resources in a RESTful API.
+
+   it's a way for clients to communicate with servers.
+
+========================================
+6) About Path and Query Parameters?
+========================================
+-> Path Parameters:
+- Used to identify a specific resource in the URL path. 
+- Example:- Check specific patients using url:
+            localhost:8000/patients/P002 -> check 2nd patient details.
