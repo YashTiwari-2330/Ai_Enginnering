@@ -97,9 +97,37 @@ EX:-
    it's a way for clients to communicate with servers.
 
 ========================================
-6) About Path and Query Parameters?
+7) About Path and Query Parameters?
 ========================================
 -> Path Parameters:
 - Used to identify a specific resource in the URL path. 
 - Example:- Check specific patients using url:
             localhost:8000/patients/P002 -> check 2nd patient details.
+
+- Use Case:- import Path from fastapi and use it in your function
+               str = Path(..., description= "" , example = " " )
+
+========================================
+8) What is a HTTP Status code?
+========================================
+
+-> An HTTP status code is a three-digit number sent by the server in the response to indicate the outcome of the client's request.
+
+HTTP Status Codes (8) + short description
+
+1) 200 OK — Request successful.
+2) 201 Created — Resource created successfully.
+3) 204 No Content — Success, but no response body.
+4) 301 Moved Permanently — Resource moved to a new URL permanently.
+5) 400 Bad Request — Invalid request (client-side error).
+6) 401 Unauthorized — Authentication required or failed.
+7) 404 Not Found — Requested resource not found.
+8) 500 Internal Server Error — Server-side error.
+
+**) QUERY PERAMETERS :-
+-> Query parameters are optional parameters in the URL that provide additional details
+   to the server about the request.
+
+-> Here's an query parameter used to catagarize the patients based on their age group.
+Example:- localhost:8000/sort/sort_by?height&order=asc
+-> So the query parameters are height and order which are optional and can be used to filter or sort the data returned as Assending and dessanding order.
