@@ -1,0 +1,4 @@
+Pydantic Introduction
+====================
+
+This chapter covers the basics of creating a Pydantic model and validating simple input data.

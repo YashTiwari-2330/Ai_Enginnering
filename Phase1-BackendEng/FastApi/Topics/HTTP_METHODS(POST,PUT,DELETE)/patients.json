@@ -1,47 +1,42 @@
-[
-  {
-    "id": "P001",
+{
+  "P001": {
     "name": "Aarav Sharma",
-    "agee": 28,
+    "age": 28,
     "height": 1.72,
     "weight": 68,
     "bmi": 23.0,
     "verdict": "Normal"
   },
-  {
-    "id": "P002",
+  "P002": {
     "name": "Priya Patel",
-    "agee": 34,
-    "height": 1.60,
+    "age": 34,
+    "height": 1.6,
     "weight": 78,
     "bmi": 30.5,
     "verdict": "Obese"
   },
-  {
-    "id": "P003",
+  "P003": {
     "name": "Rohan Mehta",
-    "agee": 45,
-    "height": 1.80,
+    "age": 45,
+    "height": 1.8,
     "weight": 82,
     "bmi": 25.3,
     "verdict": "Overweight"
   },
-  {
-    "id": "P004",
+  "P004": {
     "name": "Sneha Iyer",
-    "agee": 22,
-    "height": 1.65,
-    "weight": 50,
-    "bmi": 18.4,
-    "verdict": "Underweight"
+    "age": 22,
+    "height": 1.0,
+    "weight": 85.0,
+    "bmi": 85.0,
+    "verdict": "Obese"
   },
-  {
-    "id": "P005",
+  "P005": {
     "name": "Kabir Khan",
-    "agee": 39,
+    "age": 39,
     "height": 1.75,
     "weight": 70,
     "bmi": 22.9,
     "verdict": "Normal"
   }
-]
+}

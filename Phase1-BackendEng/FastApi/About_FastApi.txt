@@ -1,63 +1,64 @@
-========================================
+==============================
+FASTAPI & PYDANTIC NOTES
+(Readable, formatted examples)
+==============================
+
+------------------------------------------------------------
 1) What is FastAPI?
-========================================
+------------------------------------------------------------
 FastAPI is a modern, high-performance Python framework used to build APIs.
 
 What it does:
-- Creates backend services for clients like web apps, mobile apps, or other servers
-- Clients send requests; FastAPI returns responses
+- You write API endpoints (routes).
+- Clients send HTTP requests (GET/POST/etc.).
+- FastAPI returns HTTP responses.
 
 Built with:
-- Starlette (web handling)
-- Pydantic (data validation)
+- Starlette → handles web/HTTP layer
+- Pydantic → validates request/response data
 
 Key features:
-- Async support (handles many requests efficiently)
-- Automatic data validation
-- Automatic API documentation (Swagger UI)
+- Async support (good for many concurrent requests)
+- Automatic request data validation
+- Automatic API docs (Swagger UI at /docs)
+- Uses Python type hints to make code safer and cleaner
 
-Simple meaning:
-FastAPI helps you build fast, clean, and reliable backend APIs using Python.
-
-
-========================================
+------------------------------------------------------------
 2) Need of FastAPI?
-========================================
-FastAPI is useful because most applications have separate frontend and backend parts.
+------------------------------------------------------------
+Most applications use a frontend + backend setup.
 
 Example architecture:
-- Frontend: React, Angular, mobile apps, websites
-- Backend: FastAPI server
-- Database: MySQL, PostgreSQL, MongoDB, etc.
+- Frontend: React / Angular / Mobile app
+- Backend: FastAPI API server
+- Database: PostgreSQL / MySQL / MongoDB / etc.
 
 Workflow:
-- Frontend sends requests to the backend
-- Backend processes the request and returns results
+1. Frontend calls the FastAPI server.
+2. FastAPI validates input data.
+3. FastAPI performs business logic (DB operations, calculations, etc.).
+4. FastAPI returns the response.
 
-Why people choose FastAPI (benefits):
-- Speed: among the fastest Python frameworks
-- Automatic validation: checks incoming data automatically
-- Automatic docs: generates Swagger UI docs without extra effort
-- Less code: build APIs with fewer lines
-- Async support: better performance for concurrent requests
-- Type hints: makes code clearer and more maintainable
+Why people choose FastAPI:
+- Fast performance
+- Less boilerplate code
+- Built-in validation + good error messages
+- Auto-generated documentation
 
-
-========================================
+------------------------------------------------------------
 3) What is Monolithic Architecture?
-========================================
-Monolithic architecture means the entire application is built as one single project/system.
+------------------------------------------------------------
+Monolithic architecture means the entire application is built as one single unit.
 
-In a monolithic app, all parts are inside the same application, such as:
-- User authentication
-- Product management
-- Payment system
-- Order system
+In a monolith, many parts live inside the same application, for example:
+- Authentication
+- Orders
+- Payments
 - Admin panel
 - Database logic
 - API routes
 
-Example: E-commerce application
+Example (E-commerce):
 - Login system
 - Product system
 - Cart system
@@ -65,69 +66,221 @@ Example: E-commerce application
 - Order system
 - Admin system
 
+------------------------------------------------------------
+4) How to activate a virtual environment?
+------------------------------------------------------------
+If your virtual environment folder name is .venv:
 
-========================================
-4) How to activate vertual env?
-========================================
-source env_name/bin/activate
+Example:
+- source .venv/bin/activate
 
-EX:-
--> source .venv/bin/activate
-
-========================================
+------------------------------------------------------------
 5) How to start FastAPI?
-========================================
-1- Import using [from fastapi import FastAPI]
-2- Create a fastapi object like :- app = FastAPI
-3- Crate a get method like :- @app.get("/")
-4- Inside the get you create methods which run / location in uvicorn browser.
+------------------------------------------------------------
+Minimum steps:
+1. Create a FastAPI app
+2. Create routes (endpoints)
+3. Run with uvicorn
 
-5- RUN it :- 
-            1- Inside a terminal cd your currunt location
-            2- Run : uvicorn main:app --reload
-            3- IF /docs execute documentation which auto genrated
+Example: main.py
 
+```python
+from fastapi import FastAPI
 
-========================================
-6) About HTTP Methods?
-========================================
-1. An HTTP Methods is a set of request methods used to
-   perform CRUD operations on resources in a RESTful API.
+app = FastAPI()
 
-   it's a way for clients to communicate with servers.
+@app.get("/")
+def home():
+    return {"message": "Hello from FastAPI"}
+```
 
-========================================
-7) About Path and Query Parameters?
-========================================
--> Path Parameters:
-- Used to identify a specific resource in the URL path. 
-- Example:- Check specific patients using url:
-            localhost:8000/patients/P002 -> check 2nd patient details.
+Run:
+1) cd to your project folder
+2) uvicorn main:app --reload
 
-- Use Case:- import Path from fastapi and use it in your function
-               str = Path(..., description= "" , example = " " )
+Docs:
+- Open http://127.0.0.1:8000/docs
 
-========================================
-8) What is a HTTP Status code?
-========================================
+------------------------------------------------------------
+6) About HTTP Methods
+------------------------------------------------------------
+HTTP methods describe what kind of action a client wants to perform on a resource.
 
--> An HTTP status code is a three-digit number sent by the server in the response to indicate the outcome of the client's request.
+Common methods in REST APIs:
+- GET → read/fetch data
+- POST → create new data
+- PUT/PATCH → update data
+- DELETE → remove data
 
-HTTP Status Codes (8) + short description
+------------------------------------------------------------
+7) Path Parameters vs Query Parameters
+------------------------------------------------------------
+A) Path Parameters
+- Used in the URL path to identify a specific resource.
 
-1) 200 OK — Request successful.
-2) 201 Created — Resource created successfully.
-3) 204 No Content — Success, but no response body.
-4) 301 Moved Permanently — Resource moved to a new URL permanently.
-5) 400 Bad Request — Invalid request (client-side error).
-6) 401 Unauthorized — Authentication required or failed.
-7) 404 Not Found — Requested resource not found.
-8) 500 Internal Server Error — Server-side error.
+Example:
+- /patients/{patient_id}
 
-**) QUERY PERAMETERS :-
--> Query parameters are optional parameters in the URL that provide additional details
-   to the server about the request.
+Example call:
+- http://localhost:8000/patients/P002
 
--> Here's an query parameter used to catagarize the patients based on their age group.
-Example:- localhost:8000/sort/sort_by?height&order=asc
--> So the query parameters are height and order which are optional and can be used to filter or sort the data returned as Assending and dessanding order.
+In FastAPI:
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/patients/{patient_id}")
+def get_patient(patient_id: str):
+    return {"patient_id": patient_id}
+```
+
+B) Query Parameters
+- Optional values in the URL after ?
+- Used for filtering/sorting/pagination.
+
+Example:
+- /patients?age=20&sort=asc
+
+Example call:
+- http://localhost:8000/sort/sort_by?height&order=asc
+
+------------------------------------------------------------
+8) What is an HTTP Status Code?
+------------------------------------------------------------
+HTTP status codes are numbers returned by the server to indicate the result of a request.
+
+Common status codes:
+- 200 OK → request successful
+- 201 Created → resource created
+- 204 No Content → success, but no response body
+- 301 Moved Permanently → moved to a new URL
+- 400 Bad Request → invalid request (client error)
+- 401 Unauthorized → authentication missing/failed
+- 404 Not Found → resource not found
+- 500 Internal Server Error → server error
+
+------------------------------------------------------------
+9) What is Pydantic and why is it used?
+------------------------------------------------------------
+FastAPI uses Pydantic for data validation and parsing.
+
+Why it’s needed:
+- Python is dynamically typed, so input can be wrong type/format.
+- Pydantic validates incoming data automatically.
+- It also helps generate clean API schemas.
+
+Basic import:
+```python
+from pydantic import BaseModel
+```
+
+------------------------------------------------------------
+10) Pydantic: Type hints + Model example
+------------------------------------------------------------
+Example request model:
+
+```python
+from pydantic import BaseModel, EmailStr, Field
+
+class User(BaseModel):
+    name: str
+    email: EmailStr
+    age: int = Field(gt=0, lt=130)  # must be between 1 and 129
+```
+
+Use in FastAPI:
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.post("/users")
+def create_user(user: User):
+    return user
+```
+
+Now FastAPI will:
+- Parse JSON → Python types
+- Validate constraints (email format, age range, etc.)
+- Return clear 422 errors if validation fails
+
+------------------------------------------------------------
+11) Common Pydantic validation features
+------------------------------------------------------------
+1) Email validation
+```python
+from pydantic import EmailStr
+
+email: EmailStr
+```
+
+2) URL validation
+```python
+from pydantic import AnyUrl
+
+website: AnyUrl
+```
+
+3) Field constraints using Field
+```python
+from pydantic import Field
+
+age: int = Field(gt=10)  # age must be > 10
+```
+
+4) Annotated (add metadata/constraints)
+```python
+from typing import Annotated
+from pydantic import Field
+
+Age = Annotated[int, Field(gt=18, le=60, title="Age")]
+```
+
+------------------------------------------------------------
+12) Field validators (extra validation logic)
+------------------------------------------------------------
+If you need custom logic, you can use field validators.
+
+Example:
+```python
+from pydantic import BaseModel, field_validator
+
+class Item(BaseModel):
+    price: float
+
+    @field_validator("price")
+    @classmethod
+    def validate_price(cls, v: float):
+        if v < 0:
+            raise ValueError("price must be >= 0")
+        return v
+```
+
+------------------------------------------------------------
+13) Model Validators
+------------------------------------------------------------
+Model validator give the control to access whole model code and objects
+It's import from pydantic 
+not requried any classmethod and value
+model validation want only mode = "before or after"
+After inside the function wants (cls , model) not values.
+
+Example :- User want to add multiple operation and field validator so it's use model validators.
+
+from pydantic import model_validator
+
+@model_validator(mode = "after")
+def function_name(cls , model):
+   model.fieldname
+    
+
+------------------------------------------------------------
+14) Computed field
+------------------------------------------------------------
+If user want somthing but thay can't calulate but his field give us using calculating 
+So this type of synario user use computed field
+
+------------------------------------------------------------
+15) POST METHOD
+------------------------------------------------------------

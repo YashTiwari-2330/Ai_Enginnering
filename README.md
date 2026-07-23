@@ -12,7 +12,14 @@ Step by step and phase by phase understand and learning to become a Ai Enginer
 
 # Phase 1
 
-# Start FastApi Fudamental
+# Start FastAPI Fundamental
+
+## Topics
+- FastAPI
+- Pydantic (data validation)
+
+# Start FastAPI Fudamental
+
 
 -> 1- Installtion Fast api.
 

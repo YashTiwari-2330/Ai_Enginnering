@@ -1,61 +1,181 @@
-from fastapi import FastAPI , Path , HTTPException, Query
+from fastapi import FastAPI, HTTPException, status
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, EmailStr
+from typing import Annotated
 import json
-from pathlib import Path as FilePath
+import os
 
-app = FastAPI()
+app = FastAPI(title="Student CRUD using JSON")
 
-# Lode the file and data
-def load_data():
-    file_path = FilePath(__file__).with_name("patients.json")
-    with open(file_path , 'r') as f:
-        data = json.load(f)
-    return data
+DATABASE = "database.json"
 
-# Home page        
-@app.get("/")
-def welcome():
-    return {
-        "message" : "Welcome to the PATIEENT MANAGEMENT SYSTEM."
-    }
 
-#About Page
-@app.get("/about")
-def about():
-    return {
-        "message" : "This is a patient management system Which use in Hospital to store and manage a details of the patients."
-    }
+# ---------------------------
+# Pydantic Model
+# ---------------------------
 
-#Patients List
-@app.get("/patients")
-def show_patients():
-    data = load_data()
-    return "Patients List : " + str(data)
+class Student(BaseModel):
+    id: Annotated[int, Field(gt=0, description="Enter Student ID")]
+    name: Annotated[str, Field(min_length=2, max_length=20, description="Enter Student Name")]
+    age: Annotated[int, Field(gt=0, le=100, description="Enter Student Age")]
+    email: EmailStr
 
-@app.get('/patients/{patient_id}')
-def show_patient(patient_id : str = Path(..., description="The ID of the patient to retrieve" , example = "P001")):
-    data = load_data()
-    for patient in data:
-        if patient["id"] == patient_id:
-            return patient
 
-    raise HTTPException(status_code=404 , detail=f"Patient With ID {patient_id} not found..")
-    
-# Sort data
-@app.get('/sort')
-def sort_patients(sort_by : str = Query(..., description="The field to sort the patients basis of hight , weight or bmi"), order : str = Query('asc' , description="Sort in asc and dasc order")):
+# ---------------------------
+# Read Data
+# ---------------------------
 
-    valid_fields = ["height" , "weight" , "bmi"]
+def read_data():
+    if not os.path.exists(DATABASE):
+        return {"students": []}
 
-    if sort_by not in valid_fields:
-        raise HTTPException(status_code=400 , detail=f"Enter a valid field from {valid_fields}")
-    
-    if order not in ['asc' , 'desc']:
-        raise HTTPException(status_code=400 , detail= f"Enter a valid order from ['asc'] or ['desc'] ")
-    
-    data = load_data()
+    try:
+        with open(DATABASE, "r") as file:
+            return json.load(file)
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=500,
+            detail="Database JSON is corrupted."
+        )
 
-    sorted_data = sorted(data, key = lambda x : x.get(sort_by) , reverse = (order == 'desc'))
 
-    return sorted_data
-    
+# ---------------------------
+# Write Data
+# ---------------------------
 
+def write_data(data):
+    with open(DATABASE, "w") as file:
+        json.dump(data, file, indent=4)
+
+
+# ---------------------------
+# GET ALL STUDENTS
+# ---------------------------
+
+@app.get("/students")
+def get_students():
+
+    data = read_data()
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "message": "Students fetched successfully",
+            "data": data["students"]
+        }
+    )
+
+
+# ---------------------------
+# GET STUDENT BY ID
+# ---------------------------
+
+@app.get("/students/{student_id}")
+def get_student(student_id: int):
+
+    data = read_data()
+
+    for student in data["students"]:
+        if student["id"] == student_id:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={
+                    "message": "Student found",
+                    "student": student
+                }
+            )
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Student not found"
+    )
+
+
+# ---------------------------
+# CREATE STUDENT
+# ---------------------------
+
+@app.post("/students")
+def create_student(student: Student):
+
+    data = read_data()
+
+    for std in data["students"]:
+        if std["id"] == student.id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Student ID already exists"
+            )
+
+    data["students"].append(student.model_dump())
+
+    write_data(data)
+
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={
+            "message": "Student created successfully",
+            "student": student.model_dump()
+        }
+    )
+
+
+# ---------------------------
+# UPDATE STUDENT
+# ---------------------------
+
+@app.put("/students/{student_id}")
+def update_student(student_id: int, updated_student: Student):
+
+    data = read_data()
+
+    for index, student in enumerate(data["students"]):
+
+        if student["id"] == student_id:
+
+            data["students"][index] = updated_student.model_dump()
+
+            write_data(data)
+
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={
+                    "message": "Student updated successfully",
+                    "student": updated_student.model_dump()
+                }
+            )
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Student not found"
+    )
+
+
+# ---------------------------
+# DELETE STUDENT
+# ---------------------------
+
+@app.delete("/students/{student_id}")
+def delete_student(student_id: int):
+
+    data = read_data()
+
+    for student in data["students"]:
+
+        if student["id"] == student_id:
+
+            data["students"].remove(student)
+
+            write_data(data)
+
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={
+                    "message": "Student deleted successfully"
+                }
+            )
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Student not found"
+    )
