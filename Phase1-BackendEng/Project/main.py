@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import Annotated
 import json
 import os
+from report_utils import generate_report
 
 app = FastAPI(title="Student CRUD using JSON")
 
